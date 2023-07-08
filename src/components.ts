@@ -11,3 +11,9 @@ export class Size extends Component {
     super();
   }
 }
+
+export class Velocity extends Component {
+    constructor(public dx: number, public dy: number) {
+        super();
+    }
+}
