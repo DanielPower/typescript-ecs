@@ -63,6 +63,8 @@ export const createEcs = (systems: System<any>[]): ECS => {
       return ecs.entities.get(entity)!;
     },
     update: (dt: number) => {
+      // TODO cache pooledEntities
+      // TODO implement removeEntity
       for (const system of ecs.systems) {
         const pooledEntities = Object.fromEntries(
           Object.entries(system.pools).map(([poolKey, pool]) => [
