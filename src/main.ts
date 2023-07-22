@@ -1,8 +1,9 @@
 import { Component } from "./components.ts";
 import { Movement } from "./systems/movement.ts";
 import { createEcs } from "./ecs.ts";
+import { Render } from "./systems/render.ts";
 
-const ecs = createEcs([Movement]);
+const ecs = createEcs([Movement, Render]);
 
 ecs.addEntity({
   [Component.Position]: { x: 5, y: 5 },
@@ -13,6 +14,8 @@ ecs.addEntity({
   [Component.Size]: { x: 20, y: 10 },
   [Component.Velocity]: { x: 0.5, y: 0.2 },
 });
+
+console.log(ecs);
 
 let lastUpdate = Date.now();
 

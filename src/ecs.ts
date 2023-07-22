@@ -3,22 +3,19 @@ import { ComponentContainer, Component } from "./components";
 type Entity = number;
 type Pool = Set<Component>;
 
-export interface System<Pools extends { [key: string]: Pool }> {
+export type System<Pools extends { [key: string]: Pool }> = {
   pools: Pools;
   update: (
-    ecs: ECS<System<Pools>>,
+    ecs: ECS,
     pools: { [key in keyof Pools]: Set<Entity> },
-    dt: number,
+    dt: number
   ) => void;
-  render: (
-    ecs: ECS<System<Pools>>,
-    pools: { [key in keyof Pools]: Set<Entity> },
-  ) => void;
-}
+  render: (ecs: ECS, pools: { [key in keyof Pools]: Set<Entity> }) => void;
+};
 
-type ECS<Systems> = {
+type ECS = {
   entities: Map<Entity, ComponentContainer>;
-  systems: Systems;
+  systems: System<any>[];
   nextEntityId: number;
   entitiesToRemove: Set<Entity>;
   addEntity: (components?: ComponentContainer) => Entity;
@@ -28,7 +25,24 @@ type ECS<Systems> = {
   render: () => void;
 };
 
-export const createEcs = <Systems>(systems: Systems): ECS<Systems> => {
+const getEntitiesWithComponents = (ecs: ECS, pool: Pool) => {
+  const entities = new Set<Entity>();
+  for (const [entity, components] of ecs.entities) {
+    let hasComponents = true;
+    for (const component of pool) {
+      if (!(component in components)) {
+        hasComponents = false;
+        break;
+      }
+    }
+    if (hasComponents) {
+      entities.add(entity);
+    }
+  }
+  return entities;
+};
+
+export const createEcs = (systems: System<any>[]): ECS => {
   const ecs = {
     entities: new Map<Entity, ComponentContainer>(),
     systems,
@@ -49,14 +63,26 @@ export const createEcs = <Systems>(systems: Systems): ECS<Systems> => {
       return ecs.entities.get(entity)!;
     },
     update: (dt: number) => {
-      // for (const system of ecs.systems) {
-      //   system.update(ecs, system.pools, dt);
-      // }
+      for (const system of ecs.systems) {
+        const pooledEntities = Object.fromEntries(
+          Object.entries(system.pools).map(([poolKey, pool]) => [
+            poolKey,
+            getEntitiesWithComponents(ecs, pool as Pool),
+          ])
+        );
+        system.update(ecs, pooledEntities, dt);
+      }
     },
     render: () => {
-      // for (const system of ecs.systems)) {
-      //   system.render(ecs, system.pools);
-      // }
+      for (const system of ecs.systems) {
+        const pooledEntities = Object.fromEntries(
+          Object.entries(system.pools).map(([poolKey, pool]) => [
+            poolKey,
+            getEntitiesWithComponents(ecs, pool as Pool),
+          ])
+        );
+        system.render(ecs, pooledEntities);
+      }
     },
   };
   return ecs;
@@ -69,14 +95,11 @@ export const createSystem = <Pools extends { [key: string]: Pool }>({
 }: {
   pools: Pools;
   update?: (
-    ecs: ECS<System<Pools>>,
+    ecs: ECS,
     pools: { [key in keyof Pools]: Set<Entity> },
-    dt: number,
+    dt: number
   ) => void;
-  render?: (
-    ecs: ECS<System<Pools>>,
-    pools: { [key in keyof Pools]: Set<Entity> },
-  ) => void;
+  render?: (ecs: ECS, pools: { [key in keyof Pools]: Set<Entity> }) => void;
 }): System<Pools> => {
   return {
     pools,
