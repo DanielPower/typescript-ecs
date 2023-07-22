@@ -8,13 +8,14 @@ export type System<Pools extends { [key: string]: Pool }> = {
   update: (
     ecs: ECS,
     pools: { [key in keyof Pools]: Set<Entity> },
-    dt: number
+    dt: number,
   ) => void;
   render: (ecs: ECS, pools: { [key in keyof Pools]: Set<Entity> }) => void;
 };
 
 type ECS = {
   entities: Map<Entity, ComponentContainer>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   systems: System<any>[];
   nextEntityId: number;
   entitiesToRemove: Set<Entity>;
@@ -42,6 +43,7 @@ const getEntitiesWithComponents = (ecs: ECS, pool: Pool) => {
   return entities;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createEcs = (systems: System<any>[]): ECS => {
   const ecs = {
     entities: new Map<Entity, ComponentContainer>(),
@@ -60,6 +62,7 @@ export const createEcs = (systems: System<any>[]): ECS => {
       if (!ecs.entities.has(entity)) {
         throw new Error(`Entity ${entity} does not exist`);
       }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return ecs.entities.get(entity)!;
     },
     update: (dt: number) => {
@@ -67,10 +70,11 @@ export const createEcs = (systems: System<any>[]): ECS => {
       // TODO implement removeEntity
       for (const system of ecs.systems) {
         const pooledEntities = Object.fromEntries(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           Object.entries(system.pools).map(([poolKey, pool]) => [
             poolKey,
             getEntitiesWithComponents(ecs, pool as Pool),
-          ])
+          ]),
         );
         system.update(ecs, pooledEntities, dt);
       }
@@ -78,10 +82,11 @@ export const createEcs = (systems: System<any>[]): ECS => {
     render: () => {
       for (const system of ecs.systems) {
         const pooledEntities = Object.fromEntries(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           Object.entries(system.pools).map(([poolKey, pool]) => [
             poolKey,
             getEntitiesWithComponents(ecs, pool as Pool),
-          ])
+          ]),
         );
         system.render(ecs, pooledEntities);
       }
@@ -99,7 +104,7 @@ export const createSystem = <Pools extends { [key: string]: Pool }>({
   update?: (
     ecs: ECS,
     pools: { [key in keyof Pools]: Set<Entity> },
-    dt: number
+    dt: number,
   ) => void;
   render?: (ecs: ECS, pools: { [key in keyof Pools]: Set<Entity> }) => void;
 }): System<Pools> => {

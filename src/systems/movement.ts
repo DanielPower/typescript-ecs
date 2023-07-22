@@ -7,7 +7,9 @@ export const Movement = createSystem({
   },
   update: (ecs, pools, dt) => {
     for (const entity of pools.main) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const position = ecs.getComponents(entity)[Component.Position]!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const velocity = ecs.getComponents(entity)[Component.Velocity]!;
       position.x += velocity.x * dt;
       position.y += velocity.y * dt;
