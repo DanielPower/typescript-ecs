@@ -1,19 +1,20 @@
-import { Component } from "./ecs";
+export enum Component {
+  Position = "position",
+  Velocity = "velocity",
+  Size = "size",
+};
 
-export class Position extends Component {
-  constructor(public x: number, public y: number) {
-    super();
-  }
-}
-
-export class Size extends Component {
-  constructor(public width: number, public height: number) {
-    super();
-  }
-}
-
-export class Velocity extends Component {
-    constructor(public dx: number, public dy: number) {
-        super();
-    }
-}
+export type ComponentContainer = Partial<{
+  [Component.Position]: {
+    x: number;
+    y: number;
+  },
+  [Component.Velocity]: {
+    x: number;
+    y: number;
+  },
+  [Component.Size]: {
+    x: number;
+    y: number;
+  },
+}>;

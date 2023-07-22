@@ -1,16 +1,17 @@
-import {Pools, System} from "../ecs.ts";
-import {Position, Velocity} from "../components.ts";
+import {Component} from "../components.ts";
+import { createSystem } from "../ecs.ts";
 
-export class Movement extends System {
-    pools = {
-        main: new Set([Position, Velocity]),
-    };
-    update(pools: Pools, dt: number) {
-        for (const entity of pools.get('main')!) {
-            const position = this.ecs.getComponents(entity).get(Position);
-            const velocity = this.ecs.getComponents(entity).get(Velocity);
-            position.x += velocity.dx * dt;
-            position.y += velocity.dy * dt;
+export const Movement = createSystem({
+    pools: {
+        main: new Set([Component.Position, Component.Velocity]),
+    },
+    update: (ecs, pools, dt) => {
+        for (const entity of pools.main) {
+            const position = ecs.getComponents(entity)[Component.Position]!;
+            const velocity = ecs.getComponents(entity)[Component.Velocity]!;
+            position.x += velocity.x * dt;
+            position.y += velocity.y * dt;
         }
     }
-}
+});
+
