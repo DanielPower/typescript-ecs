@@ -3,11 +3,18 @@ import { ComponentContainer, Component } from "./components";
 type Entity = number;
 type Pool = Set<Component>;
 
-type System<Pools extends { [key: string]: Pool }> = {
+export interface System<Pools extends { [key: string]: Pool }> {
   pools: Pools;
-  update: (ecs: ECS<System<Pools>>, pools: {[key in keyof Pools]: Set<Entity>}, dt: number) => void; 
-  render: (ecs: ECS<System<Pools>>, pools: {[key in keyof Pools]: Set<Entity>}) => void;
-};
+  update: (
+    ecs: ECS<System<Pools>>,
+    pools: { [key in keyof Pools]: Set<Entity> },
+    dt: number,
+  ) => void;
+  render: (
+    ecs: ECS<System<Pools>>,
+    pools: { [key in keyof Pools]: Set<Entity> },
+  ) => void;
+}
 
 type ECS<Systems> = {
   entities: Map<Entity, ComponentContainer>;
@@ -50,7 +57,7 @@ export const createEcs = <Systems>(systems: Systems): ECS<Systems> => {
       // for (const system of ecs.systems)) {
       //   system.render(ecs, system.pools);
       // }
-    }
+    },
   };
   return ecs;
 };
@@ -61,12 +68,19 @@ export const createSystem = <Pools extends { [key: string]: Pool }>({
   render,
 }: {
   pools: Pools;
-  update?: (ecs: ECS<System<Pools>>, pools: {[key in keyof Pools]: Set<Entity>}, dt: number) => void;
-  render?: (ecs: ECS<System<Pools>>, pools: {[key in keyof Pools]: Set<Entity>}) => void;
+  update?: (
+    ecs: ECS<System<Pools>>,
+    pools: { [key in keyof Pools]: Set<Entity> },
+    dt: number,
+  ) => void;
+  render?: (
+    ecs: ECS<System<Pools>>,
+    pools: { [key in keyof Pools]: Set<Entity> },
+  ) => void;
 }): System<Pools> => {
-  return { 
-    pools, 
-    update: update ?? (() => {}), 
+  return {
+    pools,
+    update: update ?? (() => {}),
     render: render ?? (() => {}),
   };
-}
+};

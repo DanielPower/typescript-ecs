@@ -1,10 +1,8 @@
 import { Component } from "./components.ts";
-import {Movement} from "./systems/movement.ts";
+import { Movement } from "./systems/movement.ts";
 import { createEcs } from "./ecs.ts";
 
-const ecs = createEcs([
-  Movement,
-]);
+const ecs = createEcs([Movement]);
 
 ecs.addEntity({
   [Component.Position]: { x: 5, y: 5 },
@@ -19,15 +17,15 @@ ecs.addEntity({
 let lastUpdate = Date.now();
 
 const update = () => {
-    const time = Date.now();
-    ecs.update(time - lastUpdate);
-    lastUpdate = time;
-    setTimeout(update, 4);
+  const time = Date.now();
+  ecs.update(time - lastUpdate);
+  lastUpdate = time;
+  setTimeout(update, 4);
 };
 
 const render = () => {
-    ecs.render();
-    requestAnimationFrame(render);
+  ecs.render();
+  requestAnimationFrame(render);
 };
 
 update();

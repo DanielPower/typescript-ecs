@@ -1,4 +1,4 @@
-import {Component} from "../components.ts";
+import { Component } from "../components.ts";
 import { createSystem } from "../ecs.ts";
 
 const canvas = document.getElementById("game") as HTMLCanvasElement;
@@ -9,7 +9,7 @@ export const Render = createSystem({
     main: new Set([Component.Position, Component.Size]),
   },
   render(ecs, pools) {
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     for (const entity of pools.main) {
       const components = ecs.getComponents(entity);
@@ -18,5 +18,5 @@ export const Render = createSystem({
       ctx.strokeStyle = "red";
       ctx.strokeRect(x, y, width, height);
     }
-  }
+  },
 });
