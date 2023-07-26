@@ -59,11 +59,11 @@ export const createEcs = (systems: System<any>[]): ECS => {
       ecs.entitiesToRemove.add(entity);
     },
     getComponents: (entity: Entity) => {
-      if (!ecs.entities.has(entity)) {
+      const components = ecs.entities.get(entity);
+      if (!components) {
         throw new Error(`Entity ${entity} does not exist`);
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return ecs.entities.get(entity)!;
+      return components;
     },
     update: (dt: number) => {
       // TODO cache pooledEntities
